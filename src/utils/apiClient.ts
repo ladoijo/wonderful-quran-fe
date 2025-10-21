@@ -10,6 +10,7 @@ import type {
   Chapter,
   ChapterResp,
   ChaptersResp,
+  Juz,
   JuzsResp,
   Verse,
   VersesResp
@@ -48,7 +49,25 @@ export const getChapterCached = unstable_cache(
   }
 );
 
-export const getJuzsCached = unstable_cache(async () => api<JuzsResp>(API_JUZS), ['juzs:en'], {
+export async function getJuzs() {
+  const res = await api<JuzsResp>(API_JUZS, { queryParams: { language: 'en' } });
+  const seen = new Set<number>();
+  return res.juzs
+    .filter((juz) => {
+      if (seen.has(juz.juz_number)) return false;
+      seen.add(juz.juz_number);
+      return true;
+    })
+    .reduce(
+      (acc, item) => {
+        acc[item.juz_number] = item;
+        return acc;
+      },
+      {} as Record<number, Juz>
+    );
+}
+
+export const getJuzsCached = unstable_cache(async () => getJuzs(), ['juzs:en'], {
   revalidate: 3600
 });
 

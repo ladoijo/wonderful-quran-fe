@@ -1,12 +1,12 @@
-import { Select, Separator, TextField } from '@radix-ui/themes';
+import { Separator } from '@radix-ui/themes';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MADE_BY_URL } from '@/utils/env';
 
 const Header = () => {
   return (
-    <header className="sticky top-0 z-50 bg-white shadow">
-      <div className="relative py-2 flex h-16 items-center justify-between px-4">
+    <header className="relative top-0 z-50 bg-white shadow h-16">
+      <div className="relative py-2 h-full flex items-center justify-between px-4">
         <div className="z-1 flex h-full flex-row items-center gap-4 group hover:cursor-pointer">
           <Link href="/" aria-label="Go to Wonderful Quran home">
             <Image
@@ -34,11 +34,16 @@ const Header = () => {
             />
           </Link>
         </div>
-        <div className="z-0 absolute left-1/2 top-1/2 flex h-full w-full -translate-x-1/2 -translate-y-1/2 flex-row items-center justify-center">
+        {/* TODO: Add search feature later */}
+        {/* <div className="z-0 absolute left-1/2 top-1/2 flex h-full w-full -translate-x-1/2 -translate-y-1/2 flex-row items-center justify-center">
           <TextField.Root placeholder="Keyword..." variant="classic" className="w-1/2" size="3">
             <TextField.Slot side="left" pl={'0'}>
               <Select.Root defaultValue="quran" size="3">
-                <Select.Trigger variant="classic" className="!rounded-r-none" />
+                <Select.Trigger
+                  variant="classic"
+                  className="!rounded-r-none"
+                  aria-label="Search by"
+                />
                 <Select.Content variant="solid">
                   <Select.Group>
                     <Select.Label>Search by</Select.Label>
@@ -51,7 +56,7 @@ const Header = () => {
               </Select.Root>
             </TextField.Slot>
           </TextField.Root>
-        </div>
+        </div> */}
       </div>
     </header>
   );

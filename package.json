@@ -15,7 +15,8 @@
     "axios": "^1.12.2",
     "next": "15.5.3",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "styles.css": "link:@radix-ui/themes/styles.css"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
@@ -28,6 +29,7 @@
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^4",
+    "themes": "link:@types/@radix-ui/themes",
     "typescript": "^5"
   }
 }

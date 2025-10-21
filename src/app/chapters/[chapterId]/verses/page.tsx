@@ -1,8 +1,25 @@
+import type { Metadata } from 'next';
 import ViewVerses from '@/components/ViewVerses';
-import { getVersesByChapterIdCached } from '@/utils/apiClient';
+import { getChaptersCached, getVersesByChapterIdCached } from '@/utils/apiClient';
 
 interface PageProps {
   params: { chapterId: string };
+}
+
+export async function generateMetadata({
+  params
+}: {
+  params: { chapterId: string };
+}): Promise<Metadata> {
+  const { chapterId } = await params;
+  const chapterIdNum: number = Number(chapterId);
+  const chapters = await getChaptersCached();
+  const chapter = chapters[chapterIdNum];
+
+  return {
+    title: `Chapter ${chapterId}: ${chapter.name_simple}`,
+    description: 'Verses by Chapter'
+  };
 }
 
 export default async function ChapterVersesPage({ params }: PageProps) {
@@ -13,10 +30,12 @@ export default async function ChapterVersesPage({ params }: PageProps) {
   const res = await getVersesByChapterIdCached({ chapterId: chapterIdNum, page: 1 });
   const firstVersePage = res.verses;
 
-  const loadMoreVerses = async (page: number) => {
-    'use server';
-    return getVersesByChapterIdCached({ chapterId: chapterIdNum, page });
-  };
-
-  return <ViewVerses firstVersePage={firstVersePage} onLoadMore={loadMoreVerses} />;
+  return (
+    <ViewVerses
+      versesBy="chapter"
+      firstVersePage={firstVersePage}
+      initialCategoryId={chapterIdNum}
+      initialPagination={res.pagination}
+    />
+  );
 }

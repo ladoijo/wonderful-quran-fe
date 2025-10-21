@@ -6,6 +6,7 @@ import { Theme } from '@radix-ui/themes';
 import localFont from 'next/font/local';
 import Header from '@/components/Header';
 import { QuranProvider } from '@/contexts/QuranProvider';
+import type { Chapter, Juz } from '@/types/quran';
 import { getChaptersCached, getJuzsCached } from '@/utils/apiClient';
 
 const lpmqFont = localFont({
@@ -39,7 +40,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [chapters, { juzs }] = await Promise.all([getChaptersCached(), getJuzsCached()]);
+  let chapters: Record<number, Chapter> | undefined;
+  let juzs: Record<number, Juz> | undefined;
+
+  try {
+    const res = await Promise.all([getChaptersCached(), getJuzsCached()]);
+    chapters = res[0];
+    juzs = res[1];
+  } catch (error) {
+    console.log(error);
+  }
+
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <body

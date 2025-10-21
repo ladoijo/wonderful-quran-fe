@@ -14,15 +14,17 @@ export default function ChaptersContent() {
           <Link href={`/chapters/${value.id}/verses`} className="block h-full">
             <Card className="h-full group hover:bg-emerald-200 transition-colors hover:cursor-pointer">
               <Flex gap="3" align="center" height="100%">
-                <Text
-                  as="span"
-                  size="3"
-                  color="gray"
-                  weight="bold"
-                  className="group-hover:bg-emerald-200 transition-colors rounded-full bg-gray-200 p-2 w-10 aspect-square flex items-center justify-center"
-                >
-                  {value.id}
-                </Text>
+                <Box className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-gray-200 transition-colors group-hover:bg-emerald-200">
+                  <Text
+                    as="span"
+                    size="3"
+                    color="gray"
+                    weight="bold"
+                    className="group-hover:bg-emerald-200 transition-colors rounded-full bg-gray-200 p-2 flex items-center justify-center"
+                  >
+                    {value.id}
+                  </Text>
+                </Box>
                 <Box>
                   <Text as="div" size="2" weight="bold">
                     {value.name_simple}

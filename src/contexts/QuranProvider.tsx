@@ -6,7 +6,7 @@ import { getChaptersCached, getJuzsCached } from '@/utils/apiClient';
 
 type QuranContextValue = {
   chapters: Record<number, Chapter>;
-  juzs: Juz[];
+  juzs: Record<number, Juz>;
 };
 
 const QuranContext = createContext<QuranContextValue | null>(null);
@@ -18,20 +18,20 @@ export function QuranProvider({
 }: Readonly<{
   children: ReactNode;
   initialChapters?: QuranContextValue['chapters'];
-  initialJuzs?: Juz[];
+  initialJuzs?: QuranContextValue['juzs'];
 }>) {
   const [chapters, setChapters] = useState<QuranContextValue['chapters']>(initialChapters ?? []);
-  const [juzs, setJuzs] = useState<Juz[]>(initialJuzs ?? []);
+  const [juzs, setJuzs] = useState<QuranContextValue['juzs']>(initialJuzs ?? []);
 
   useEffect(() => {
-    if (chapters && Object.keys(chapters).length && juzs.length) return; // already hydrated from server
+    if (chapters && Object.keys(chapters).length && juzs && Object.keys(juzs).length) return; // already hydrated from server
     // fetch as a fallback when SSR data wasn’t provided (e.g., client-only route)
     (async () => {
       const [resChapters, resJuzs] = await Promise.all([getChaptersCached(), getJuzsCached()]);
       setChapters(resChapters);
-      setJuzs(resJuzs.juzs);
+      setJuzs(resJuzs);
     })();
-  }, [chapters, juzs.length]);
+  }, [chapters, juzs]);
 
   const contextValue = useMemo(() => ({ chapters, juzs }), [chapters, juzs]);
 
