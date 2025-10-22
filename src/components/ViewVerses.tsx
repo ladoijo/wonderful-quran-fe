@@ -4,7 +4,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import { Button, Select, Skeleton, Spinner } from '@radix-ui/themes';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuranContext } from '@/contexts/QuranProvider';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import type { Chapter, Juz, Verse } from '@/types/quran';
@@ -38,21 +38,12 @@ export default function ViewVerses({
   const firstVerse = Object.values(firstVersePage)[0];
   const chapterId = firstVerse?.chapter_id ?? initialCategoryId;
   const chapter = chapters[chapterId];
-  let categories: Record<number, Chapter> | Record<number, Juz>;
-  let btnPrevText: string;
-  let btnNextText: string;
   const baseRoute = versesBy === 'juz' ? '/juzs' : '/chapters';
-  if (versesBy === 'juz') {
-    categories = juzs;
-    btnPrevText = currentCategoryId > 1 ? `Juz ${currentCategoryId - 1}` : '';
-    btnNextText = currentCategoryId < 30 ? `Juz ${currentCategoryId + 1}` : '';
-  } else {
-    categories = chapters;
-    const prevChapter = chapters[currentCategoryId - 1];
-    const nextChapter = chapters[currentCategoryId + 1];
-    btnPrevText = prevChapter ? prevChapter.name_simple : '';
-    btnNextText = nextChapter ? nextChapter.name_simple : '';
-  }
+
+  const { categories, btnPrevText, btnNextText } = useMemo(
+    () => computeNavigationData({ versesBy, currentCategoryId, chapters, juzs }),
+    [chapters, currentCategoryId, juzs, versesBy]
+  );
 
   useEffect(() => {
     setVerses(firstVersePage);
@@ -149,9 +140,7 @@ export default function ViewVerses({
                 {Object.entries(categories).map(([key, value]) => {
                   return (
                     <Select.Item key={key} value={key}>
-                      {versesBy === 'juz'
-                        ? `Juz ${value.juz_number ?? key}`
-                        : (value as Chapter).name_simple}
+                      {formatCategoryLabel(versesBy, key, value)}
                     </Select.Item>
                   );
                 })}
@@ -262,4 +251,54 @@ export default function ViewVerses({
       </section>
     </main>
   );
+}
+
+type NavigationParams = {
+  versesBy: PageProps['versesBy'];
+  currentCategoryId: number;
+  chapters: Record<number, Chapter>;
+  juzs: Record<number, Juz>;
+};
+
+type NavigationData = {
+  categories: Record<number, Chapter | Juz>;
+  btnPrevText: string;
+  btnNextText: string;
+};
+
+function computeNavigationData({
+  versesBy,
+  currentCategoryId,
+  chapters,
+  juzs
+}: NavigationParams): NavigationData {
+  if (versesBy === 'juz') {
+    return {
+      categories: juzs,
+      btnPrevText: currentCategoryId > 1 ? `Juz ${currentCategoryId - 1}` : '',
+      btnNextText: currentCategoryId < 30 ? `Juz ${currentCategoryId + 1}` : ''
+    };
+  }
+
+  const prevChapter = chapters[currentCategoryId - 1];
+  const nextChapter = chapters[currentCategoryId + 1];
+
+  return {
+    categories: chapters,
+    btnPrevText: prevChapter?.name_simple ?? '',
+    btnNextText: nextChapter?.name_simple ?? ''
+  };
+}
+
+function formatCategoryLabel(
+  versesBy: PageProps['versesBy'],
+  key: string,
+  value: Chapter | Juz
+): string {
+  if (versesBy === 'juz') {
+    const juzValue = value as Juz;
+    return `Juz ${juzValue.juz_number ?? key}`;
+  }
+
+  return (value as Chapter).name_simple;
 }
