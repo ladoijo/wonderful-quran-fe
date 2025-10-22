@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
-import { Button, Flex, Grid, Select, Skeleton, Spinner } from '@radix-ui/themes';
+import { Button, Select, Skeleton, Spinner } from '@radix-ui/themes';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -29,7 +29,8 @@ export default function ViewVerses({
   const [verses, setVerses] = useState<Record<number, Verse>>(firstVersePage);
   const [currentCategoryId, setCurrentCategoryId] = useState(initialCategoryId);
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loadMoreLoading, setLoadMoreLoading] = useState(false);
+  const [categoryLoading, setCategoryLoading] = useState(false);
   const [hasMore, setHasMore] = useState(
     initialPagination?.total_pages ? 1 < initialPagination.total_pages : false
   );
@@ -58,12 +59,15 @@ export default function ViewVerses({
     setCurrentCategoryId(initialCategoryId);
     setCurrentPage(1);
     setHasMore(initialPagination?.total_pages ? 1 < initialPagination.total_pages : false);
+    setCategoryLoading(false);
   }, [firstVersePage, initialCategoryId, initialPagination]);
 
   const navigateToCategory = useCallback(
     (targetId: number) => {
       if (Number.isNaN(targetId) || targetId === currentCategoryId) return;
+      setCategoryLoading(true);
       setCurrentCategoryId(targetId);
+      setVerses({});
       router.push(`${baseRoute}/${targetId}/verses`);
     },
     [baseRoute, currentCategoryId, router]
@@ -92,9 +96,9 @@ export default function ViewVerses({
   );
 
   const loadMoreVerses = useCallback(async () => {
-    if (loading || !hasMore) return;
+    if (loadMoreLoading || !hasMore) return;
     try {
-      setLoading(true);
+      setLoadMoreLoading(true);
       const nextPage = currentPage + 1;
       const respVerses =
         versesBy === 'juz'
@@ -110,52 +114,66 @@ export default function ViewVerses({
       // TODO: Show this error on snackbar or alert
       console.error('Error loading more verses:', error);
     } finally {
-      setLoading(false);
+      setLoadMoreLoading(false);
     }
-  }, [currentPage, currentCategoryId, hasMore, loading, versesBy]);
+  }, [currentPage, currentCategoryId, hasMore, loadMoreLoading, versesBy]);
 
   const { sentinelRef } = useInfiniteScroll({
-    enabled: hasMore && !loading,
+    enabled: hasMore && !loadMoreLoading,
     rootMargin: '400px',
     onLoadMore: () => {
       void loadMoreVerses();
     }
   });
 
+  const showChapterSkeleton = categoryLoading || (!verses && loadMoreLoading);
+
   return (
-    <div className="flex flex-col w-[1000px] gap-4 mx-auto">
-      <Grid
-        columns="auto 1fr auto"
-        gap="3"
-        width="auto"
-        className="sticky shadow top-0 z-1 p-4 bg-white rounded-b"
-      >
-        <Button variant="classic" color="gold" onClick={handlePrevCategory} hidden={!btnPrevText}>
+    <main className="flex flex-col w-[1000px] gap-4 mx-auto">
+      <div className="flex items-center gap-3 sticky top-0 z-1 p-4 bg-white shadow rounded-b">
+        <Button
+          variant="classic"
+          color="gold"
+          onClick={handlePrevCategory}
+          hidden={!btnPrevText}
+          className="flex-shrink-0"
+        >
           <ChevronLeftIcon /> {btnPrevText}
         </Button>
-        <Select.Root value={currentCategoryId.toString()} onValueChange={handleCategoryChange}>
-          <Select.Trigger />
-          <Select.Content color="gold">
-            <Select.Group>
-              <Select.Label>{versesBy === 'juz' ? 'Juz' : 'Chapter'}</Select.Label>
-              {Object.entries(categories).map(([key, value]) => {
-                return (
-                  <Select.Item key={key} value={key}>
-                    {versesBy === 'juz'
-                      ? `Juz ${value.juz_number ?? key}`
-                      : (value as Chapter).name_simple}
-                  </Select.Item>
-                );
-              })}
-            </Select.Group>
-          </Select.Content>
-        </Select.Root>
-        <Button variant="classic" color="gold" onClick={handleNextCategory} hidden={!btnNextText}>
+        <div className="flex-1 min-w-0">
+          <Select.Root value={currentCategoryId.toString()} onValueChange={handleCategoryChange}>
+            <Select.Trigger className="!w-full" />
+            <Select.Content color="gold">
+              <Select.Group>
+                <Select.Label>{versesBy === 'juz' ? 'Juz' : 'Chapter'}</Select.Label>
+                {Object.entries(categories).map(([key, value]) => {
+                  return (
+                    <Select.Item key={key} value={key}>
+                      {versesBy === 'juz'
+                        ? `Juz ${value.juz_number ?? key}`
+                        : (value as Chapter).name_simple}
+                    </Select.Item>
+                  );
+                })}
+              </Select.Group>
+            </Select.Content>
+          </Select.Root>
+        </div>
+        <Button
+          variant="classic"
+          color="gold"
+          onClick={handleNextCategory}
+          hidden={!btnNextText}
+          className="flex-shrink-0"
+        >
           {btnNextText} <ChevronRightIcon />
         </Button>
-      </Grid>
-      <Flex className="flex-col gap-1 items-center text-center w-full">
-        {!verses && loading ? (
+      </div>
+      <section
+        aria-labelledby="chapter-heading"
+        className="flex flex-col gap-1 items-center text-center w-full"
+      >
+        {showChapterSkeleton ? (
           <>
             <Skeleton height="40px" width="75px" />
             <Skeleton height="28px" width="100px" />
@@ -163,25 +181,26 @@ export default function ViewVerses({
           </>
         ) : (
           <>
-            <h1 className="text-4xl font-bold font-lpmqFont">{chapter?.name_arabic}</h1>
+            <h1 id="chapter-heading" className="text-4xl font-bold font-lpmqFont">
+              {chapter?.name_arabic}
+            </h1>
             <h2 className="text-xl font-bold">{chapter?.name_simple}</h2>
             <p className="text-sm text-gray-500">
               {chapter?.revelation_place && capitalizeWords(chapter.revelation_place)}
             </p>
+            <Image
+              src={bismillahImage}
+              alt="Arabic calligraphy of Bismillah ar-Rahman ar-Raheem"
+              width={500}
+              height={120}
+              className="flex pt-10 h-20 w-80 flex-1 items-center justify-center text-black"
+            />
           </>
         )}
-
-        <Image
-          src={bismillahImage}
-          alt="Bismillah calligraphy"
-          width={500}
-          height={120}
-          className="flex pt-10 h-20 w-80 flex-1 items-center justify-center text-black"
-        />
-      </Flex>
-      <Flex className="flex-col gap-1 items-center w-full">
+      </section>
+      <section aria-label="verses-content" className="flex-col gap-1 items-center w-full">
         <div className="flex flex-col h-fit divide-y divide-gray-400 w-full">
-          {!verses && loading && (
+          {showChapterSkeleton && (
             <div className="flex-col w-full h-fit py-8">
               <Skeleton height="96px" width="100%" />
               <Skeleton height="28px" width="100%" className="mt-8" />
@@ -194,8 +213,11 @@ export default function ViewVerses({
               return (
                 <div key={key} className="flex-col w-full h-fit py-8">
                   {index !== 0 && value.verse_number === 1 && (
-                    <Flex className="flex-col gap-1 items-center text-center">
-                      <h1 className="text-4xl font-bold font-lpmqFont">
+                    <section
+                      aria-labelledby="chapter-heading"
+                      className="flex flex-col gap-1 items-center text-center"
+                    >
+                      <h1 id="chapter-heading" className="text-4xl font-bold font-lpmqFont">
                         {chapters[value.chapter_id].name_arabic}
                       </h1>
                       <h2 className="text-xl font-bold">
@@ -207,12 +229,12 @@ export default function ViewVerses({
                       </p>
                       <Image
                         src={bismillahImage}
-                        alt="Bismillah calligraphy"
+                        alt="Arabic calligraphy of Bismillah ar-Rahman ar-Raheem"
                         width={500}
                         height={120}
                         className="flex pt-10 h-20 w-80 flex-1 items-center justify-center text-black"
                       />
-                    </Flex>
+                    </section>
                   )}
                   <p className="font-bold text-4xl text-end font-lpmqFont leading-24">
                     {value.text_uthmani}{' '}
@@ -230,14 +252,14 @@ export default function ViewVerses({
         </div>
 
         {/* Loading indicator */}
-        {verses && loading && (
+        {Object.keys(verses).length > 0 && loadMoreLoading && (
           <div className="flex justify-center py-4">
             <Spinner size="3" />
           </div>
         )}
 
         <div ref={sentinelRef} style={{ height: 1 }} />
-      </Flex>
-    </div>
+      </section>
+    </main>
   );
 }

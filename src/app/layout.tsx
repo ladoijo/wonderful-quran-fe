@@ -31,8 +31,40 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Wonderful Quran',
-  description: 'Wonderful Quran by HDygiDev'
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://wonderful-quran.netlify.app'),
+  title: {
+    template: '%s · Wonderful Quran',
+    default: 'Wonderful Quran – Explore the Revelation'
+  },
+  description:
+    'Study Quran chapters, verses, and translations with a modern interface. Created by HDygiDev',
+  alternates: {
+    canonical: '/',
+    languages: {
+      'en-US': '/en'
+    }
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large' }
+  },
+  openGraph: {
+    type: 'website',
+    title: 'Wonderful Quran',
+    description:
+      'Discover Quranic chapters, and translations in a beautifully designed experience.',
+    url: '/',
+    siteName: 'Wonderful Quran',
+    images: [{ url: '/og/home.jpg', width: 1200, height: 630, alt: 'Wonderful Quran interface' }]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Wonderful Quran',
+    description:
+      'Explore Quran chapters, translations, tajweed, and tafsir with a thoughtful interface.',
+    images: ['/og/home.jpg']
+  }
 };
 
 export default async function RootLayout({

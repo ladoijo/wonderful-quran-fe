@@ -18,7 +18,15 @@ export async function generateMetadata({
 
   return {
     title: `Chapter ${chapterId}: ${chapter.name_simple}`,
-    description: 'Verses by Chapter'
+    description: `Explore verses of Chapter ${chapter.name_simple}`,
+    alternates: {
+      canonical: `/chapters/${chapterId}/verses`
+    },
+    openGraph: {
+      title: `Chapter ${chapterId}: ${chapter.name_simple}`,
+      description: `Explore verses of Chapter ${chapter.name_simple}`,
+      url: `/chapters/${chapterId}/verses`
+    }
   };
 }
 

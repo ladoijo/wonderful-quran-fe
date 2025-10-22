@@ -24,7 +24,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `Juz ${juzNumberNum}: ${juzChapterName}`,
-    description: 'Verses by Juz'
+    description: 'Verses by Juz',
+    alternates: {
+      canonical: `/juzs/${juzNumberNum}/verses`
+    },
+    openGraph: {
+      title: `Juz ${juzNumberNum}: ${juzChapterName}`,
+      description: `Explore verses of Juz ${juzNumberNum}`,
+      url: `/juzs/${juzNumberNum}/verses`
+    }
   };
 }
 
