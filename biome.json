@@ -32,7 +32,8 @@
       "correctness": {
         "noUnusedImports": {
           "level": "warn",
-          "fix": "safe"
+          "fix": "safe",
+          "options": {}
         }
       }
     },
