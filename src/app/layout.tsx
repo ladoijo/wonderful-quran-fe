@@ -64,6 +64,9 @@ export const metadata: Metadata = {
     description:
       'Explore Quran chapters, translations, tajweed, and tafsir with a thoughtful interface.',
     images: ['/og/home.jpg']
+  },
+  other: {
+    'google-site-verification': 'a6iJGnvsQYP9yKQxvWj0l-qfcXYoRJYR3tkV3dinsa0'
   }
 };
 
@@ -85,6 +88,12 @@ export default async function RootLayout({
 
   return (
     <html lang="en" data-scroll-behavior="smooth">
+      <head>
+        <meta
+          name="google-site-verification"
+          content="a6iJGnvsQYP9yKQxvWj0l-qfcXYoRJYR3tkV3dinsa0"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${lpmqFont.variable} antialiased`}
       >

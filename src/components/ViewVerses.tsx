@@ -133,7 +133,7 @@ export default function ViewVerses({
         </Button>
         <div className="flex-1 min-w-0">
           <Select.Root value={currentCategoryId.toString()} onValueChange={handleCategoryChange}>
-            <Select.Trigger className="!w-full" />
+            <Select.Trigger className="!w-full" aria-label="Select chapter or juz" />
             <Select.Content color="gold">
               <Select.Group>
                 <Select.Label>{versesBy === 'juz' ? 'Juz' : 'Chapter'}</Select.Label>
