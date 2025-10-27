@@ -2,8 +2,8 @@
 
 import { Badge, Box, Card, Flex, Text } from '@radix-ui/themes';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 import { useQuranContext } from '@/contexts/QuranProvider';
 import type { Juz } from '@/types/quran';
 import JuzTooltip from './JuzTooltip';
@@ -26,23 +26,22 @@ export default function JuzsContent() {
     [chapters]
   );
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Manually managing dependencies to optimize prefetching
-  useEffect(() => {
-    if (!juzs || Object.keys(juzs).length === 0) return;
-    const juzEntries = Object.values(juzs)
-      .sort((a, b) => a.juz_number - b.juz_number)
-      .slice(0, 6);
+  // useEffect(() => {
+  //   if (!juzs || Object.keys(juzs).length === 0) return;
+  //   const juzEntries = Object.values(juzs)
+  //     .sort((a, b) => a.juz_number - b.juz_number)
+  //     .slice(0, 6);
 
-    for (const juz of juzEntries) {
-      prefetchJuz(juz.juz_number);
-    }
-  }, [juzs, router]);
+  //   for (const juz of juzEntries) {
+  //     prefetchJuz(juz.juz_number);
+  //   }
+  // }, [juzs, router]);
 
   return (
     <main>
       <section aria-label="juzs-content" className="flex flex-wrap gap-4 justify-center">
         {Object.values(juzs).map((juz: Juz) => (
-          <Box key={juz.juz_number} minWidth="320px" maxWidth="350px" height="70px">
+          <Box key={juz.juz_number} className="w-80 sm:w-96 h-[70px]">
             <Link
               href={`/juzs/${juz.juz_number}/verses`}
               className="block h-full"
