@@ -17,6 +17,10 @@ import type {
 } from '@/types/quran';
 import { api } from './api';
 
+const VERSE_FIELDS = ['id', 'chapter_id', 'verse_number', 'text_uthmani', 'verse_key'].join(',');
+const TRANSLATION_FIELDS = ['id', 'text', 'language_name'].join(',');
+const WORD_FIELDS = ['position', 'transliteration.text'].join(',');
+
 export async function getChapters() {
   const res = await api<ChaptersResp>(API_CHAPTERS, { queryParams: { language: 'en' } });
 
@@ -84,13 +88,9 @@ export async function getVersesByChapterId({
       language: 'en',
       words: true,
       translations: 85,
-      audio: 1,
-      word_fields:
-        'verse_id,chapter_id,text_uthmani,text_indopak,text_imlaei_simple,text_imlaei,text_uthmani_simple,text_uthmani_tajweed,text_qpc_hafs,verse_key,location,code_v1,code_v2,v1_page,v2_page,line_number,line_v2,line_v1',
-      translation_fields:
-        'chapter_id,verse_number,verse_key,juz_number,hizb_number,rub_el_hizb_number,page_number,ruku_number,manzil_number,resource_name,language_name,language_id,id',
-      fields:
-        'chapter_id,text_indopak,text_imlaei_simple,text_imlaei,text_uthmani,text_uthmani_simple,text_uthmani_tajweed,text_qpc_hafs,qpc_uthmani_hafs,text_qpc_nastaleeq_hafs,text_qpc_nastaleeq,text_indopak_nastaleeq,image_url,image_width,code_v1,code_v2,page_number,v1_page,v2_page',
+      word_fields: WORD_FIELDS,
+      translation_fields: TRANSLATION_FIELDS,
+      fields: VERSE_FIELDS,
       page,
       per_page: 10
     }
@@ -134,13 +134,9 @@ export async function getVersesByJuzNumber({
       language: 'en',
       words: true,
       translations: 85,
-      audio: 1,
-      word_fields:
-        'verse_id,chapter_id,text_uthmani,text_indopak,text_imlaei_simple,text_imlaei,text_uthmani_simple,text_uthmani_tajweed,text_qpc_hafs,verse_key,location,code_v1,code_v2,v1_page,v2_page,line_number,line_v2,line_v1',
-      translation_fields:
-        'chapter_id,verse_number,verse_key,juz_number,hizb_number,rub_el_hizb_number,page_number,ruku_number,manzil_number,resource_name,language_name,language_id,id',
-      fields:
-        'chapter_id,text_indopak,text_imlaei_simple,text_imlaei,text_uthmani,text_uthmani_simple,text_uthmani_tajweed,text_qpc_hafs,qpc_uthmani_hafs,text_qpc_nastaleeq_hafs,text_qpc_nastaleeq,text_indopak_nastaleeq,image_url,image_width,code_v1,code_v2,page_number,v1_page,v2_page',
+      word_fields: WORD_FIELDS,
+      translation_fields: TRANSLATION_FIELDS,
+      fields: VERSE_FIELDS,
       page,
       per_page: 10
     }
