@@ -16,6 +16,7 @@ const Header = () => {
               priority={true}
               width={112}
               height={64}
+              fetchPriority="high"
             />
           </Link>
           <Separator className="h-16 w-px bg-black" decorative orientation="vertical" />
@@ -31,6 +32,7 @@ const Header = () => {
               className="h-16 w-24"
               width={96}
               height={64}
+              fetchPriority="high"
             />
           </Link>
         </div>
