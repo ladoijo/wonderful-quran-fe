@@ -3,8 +3,8 @@ import { Suspense } from 'react';
 import ChaptersContent from './components/ChaptersContent';
 import JuzsContent from './components/JuzsContent';
 
-export const runtime = 'nodejs'; // important for axios (Node APIs)
-export const revalidate = 3600; // optional; main caching is in unstable_cache
+export const runtime = 'nodejs';
+export const revalidate = 3600;
 
 export default function HomePage() {
   return (

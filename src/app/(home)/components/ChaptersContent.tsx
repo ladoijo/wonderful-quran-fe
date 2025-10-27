@@ -2,17 +2,42 @@
 
 import { Box, Card, Flex, Text } from '@radix-ui/themes';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { useQuranContext } from '@/contexts/QuranProvider';
 import { capitalizeWords } from '@/utils/formatter';
 
 export default function ChaptersContent() {
   const { chapters } = useQuranContext();
+  const router = useRouter();
+
+  function prefetchChapter(chapterId: number) {
+    router.prefetch(`/chapters/${chapterId}/verses`);
+  }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Manually managing dependencies to optimize prefetching
+  useEffect(() => {
+    if (!chapters || Object.keys(chapters).length === 0) return;
+    const chapterEntries = Object.values(chapters)
+      .sort((a, b) => a.id - b.id)
+      .slice(0, 6);
+
+    for (const chapter of chapterEntries) {
+      prefetchChapter(chapter.id);
+    }
+  }, [chapters, router]);
+
   return (
     <main>
       <section aria-label="chapters-content" className="flex flex-wrap gap-4 justify-center">
         {Object.values(chapters).map((value) => (
-          <Box key={value.id} minWidth="350px" maxWidth="350px" height="70px">
-            <Link href={`/chapters/${value.id}/verses`} className="block h-full">
+          <Box key={value.id} minWidth="320px" maxWidth="350px" height="70px">
+            <Link
+              href={`/chapters/${value.id}/verses`}
+              className="block h-full"
+              prefetch
+              onMouseEnter={() => prefetchChapter(value.id)}
+            >
               <Card className="h-full group hover:bg-emerald-200 transition-colors hover:cursor-pointer">
                 <Flex gap="3" align="center" height="100%">
                   <Box className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-gray-200 transition-colors group-hover:bg-emerald-200">
