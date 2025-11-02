@@ -31,7 +31,7 @@ export default function ChaptersContent() {
     <main>
       <section aria-label="chapters-content" className="flex flex-wrap gap-4 justify-center">
         {Object.values(chapters).map((value) => (
-          <Box key={value.id} minWidth="320px" maxWidth="350px" height="70px">
+          <Box key={value.id} className="w-80 sm:w-96 h-[70px]">
             <Link
               href={`/chapters/${value.id}/verses`}
               className="block h-full"

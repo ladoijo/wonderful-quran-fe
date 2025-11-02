@@ -2,7 +2,7 @@
 
 import { Badge, Box, Card, Flex, Text } from '@radix-ui/themes';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 import { useQuranContext } from '@/contexts/QuranProvider';
 import type { Juz } from '@/types/quran';
@@ -42,7 +42,7 @@ export default function JuzsContent() {
     <main>
       <section aria-label="juzs-content" className="flex flex-wrap gap-4 justify-center">
         {Object.values(juzs).map((juz: Juz) => (
-          <Box key={juz.juz_number} minWidth="320px" maxWidth="350px" height="70px">
+          <Box key={juz.juz_number} className="w-80 sm:w-96 h-[70px]">
             <Link
               href={`/juzs/${juz.juz_number}/verses`}
               className="block h-full"
