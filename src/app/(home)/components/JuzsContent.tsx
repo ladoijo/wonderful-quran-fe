@@ -3,7 +3,7 @@
 import { Badge, Box, Card, Flex, Text } from '@radix-ui/themes';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useQuranContext } from '@/contexts/QuranProvider';
 import type { Juz } from '@/types/quran';
 import JuzTooltip from './JuzTooltip';
@@ -26,16 +26,17 @@ export default function JuzsContent() {
     [chapters]
   );
 
-  // useEffect(() => {
-  //   if (!juzs || Object.keys(juzs).length === 0) return;
-  //   const juzEntries = Object.values(juzs)
-  //     .sort((a, b) => a.juz_number - b.juz_number)
-  //     .slice(0, 6);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Manually managing dependencies to optimize prefetching
+  useEffect(() => {
+    if (!juzs || Object.keys(juzs).length === 0) return;
+    const juzEntries = Object.values(juzs)
+      .sort((a, b) => a.juz_number - b.juz_number)
+      .slice(0, 6);
 
-  //   for (const juz of juzEntries) {
-  //     prefetchJuz(juz.juz_number);
-  //   }
-  // }, [juzs, router]);
+    for (const juz of juzEntries) {
+      prefetchJuz(juz.juz_number);
+    }
+  }, [juzs, router]);
 
   return (
     <main>
