@@ -6,6 +6,7 @@ import { Theme } from '@radix-ui/themes';
 import localFont from 'next/font/local';
 import Header from '@/components/Header';
 import { QuranProvider } from '@/contexts/QuranProvider';
+import { ToastProvider } from '@/contexts/ToastProvider';
 import type { Chapter, Juz } from '@/types/quran';
 import { getChaptersCached, getJuzsCached } from '@/utils/apiClient';
 
@@ -98,10 +99,12 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${lpmqFont.variable} antialiased`}
       >
         <Theme appearance="light" accentColor="indigo">
-          <QuranProvider initialChapters={chapters} initialJuzs={juzs}>
-            <Header />
-            {children}
-          </QuranProvider>
+          <ToastProvider>
+            <QuranProvider initialChapters={chapters} initialJuzs={juzs}>
+              <Header />
+              {children}
+            </QuranProvider>
+          </ToastProvider>
           {/* <ThemePanel /> */}
         </Theme>
       </body>
