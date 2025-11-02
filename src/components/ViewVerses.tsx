@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuranContext } from '@/contexts/QuranProvider';
+import { useToast } from '@/contexts/ToastProvider';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import type { Chapter, Juz, Verse } from '@/types/quran';
 import { type GetVerses, getVersesByChapterId, getVersesByJuzNumber } from '@/utils/apiClient';
@@ -26,6 +27,7 @@ export default function ViewVerses({
   initialPagination
 }: Readonly<PageProps>) {
   const router = useRouter();
+  const toast = useToast();
   const [verses, setVerses] = useState<Record<number, Verse>>(firstVersePage);
   const [currentCategoryId, setCurrentCategoryId] = useState(initialCategoryId);
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,6 +85,7 @@ export default function ViewVerses({
     [navigateToCategory]
   );
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <>
   const loadMoreVerses = useCallback(async () => {
     if (loadMoreLoading || !hasMore) return;
     try {
@@ -98,9 +101,15 @@ export default function ViewVerses({
       setHasMore(
         respVerses.pagination.total_pages ? nextPage < respVerses.pagination.total_pages : false
       );
-    } catch (error) {
-      // TODO: Show this error on snackbar or alert
-      console.error('Error loading more verses:', error);
+    } catch (error: unknown) {
+      console.error('Error loading verses:', error);
+      toast.showToast({
+        type: 'error',
+        title: 'Error loading verses',
+        description:
+          error instanceof Error ? error.message : 'Failed to load verses. Please try again later.',
+        duration: 6000
+      });
     } finally {
       setLoadMoreLoading(false);
     }
