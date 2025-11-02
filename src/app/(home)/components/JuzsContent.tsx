@@ -46,8 +46,10 @@ export default function JuzsContent() {
             <Link
               href={`/juzs/${juz.juz_number}/verses`}
               className="block h-full"
-              prefetch
-              onMouseEnter={() => prefetchJuz(juz.juz_number)}
+              prefetch={false}
+              onMouseEnter={() => {
+                return prefetchJuz(juz.juz_number);
+              }}
             >
               <Card className="h-full group hover:bg-emerald-200 transition-colors hover:cursor-pointer">
                 <Flex gap="3" align="center" height="100%">

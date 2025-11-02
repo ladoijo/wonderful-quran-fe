@@ -35,8 +35,10 @@ export default function ChaptersContent() {
             <Link
               href={`/chapters/${value.id}/verses`}
               className="block h-full"
-              prefetch
-              onMouseEnter={() => prefetchChapter(value.id)}
+              prefetch={false}
+              onMouseEnter={() => {
+                return prefetchChapter(value.id);
+              }}
             >
               <Card className="h-full group hover:bg-emerald-200 transition-colors hover:cursor-pointer">
                 <Flex gap="3" align="center" height="100%">
